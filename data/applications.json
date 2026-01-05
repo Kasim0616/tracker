@@ -1,0 +1,220 @@
+{
+  "next_id": 7,
+  "items": [
+    {
+      "id": 6,
+      "company": "siemens",
+      "role": "developer",
+      "link": "https://www.batterionline.no/maerker/siemens?msclkid=f0fa9a8fec1615ab6ce4f3d63c04ee85",
+      "date": "2026-01-10",
+      "status": "applied",
+      "location": "Stuttgart",
+      "notes": "no",
+      "owner": "kasim",
+      "createdAt": 1767493672117
+    },
+    {
+      "id": 5,
+      "company": "siemens",
+      "role": "developer",
+      "link": "https://www.batterionline.no/maerker/siemens?msclkid=f0fa9a8fec1615ab6ce4f3d63c04ee85",
+      "date": "2026-01-10",
+      "status": "applied",
+      "location": "Stuttgart",
+      "notes": "no",
+      "owner": "kasim",
+      "createdAt": 1767493672114
+    },
+    {
+      "id": 4,
+      "company": "siemens",
+      "role": "developer",
+      "link": "https://www.batterionline.no/maerker/siemens?msclkid=f0fa9a8fec1615ab6ce4f3d63c04ee85",
+      "date": "2026-01-10",
+      "status": "applied",
+      "location": "Stuttgart",
+      "notes": "no",
+      "owner": "kasim",
+      "createdAt": 1767493672111
+    },
+    {
+      "company": "Codex Labs",
+      "role": "Frontend Engineer",
+      "link": "https://jobs.codex.dev/frontend-engineer",
+      "date": "2025-02-18",
+      "status": "interview",
+      "location": "Remote - Europe",
+      "notes": "Portfolio review scheduled. Brush up on accessibility stories.",
+      "id": 1,
+      "createdAt": 1767493009808
+    },
+    {
+      "company": "Atlas Biotech",
+      "role": "Product Designer",
+      "link": "https://careers.atlas.bio/design",
+      "date": "2025-02-05",
+      "status": "applied",
+      "location": "Boston, MA",
+      "notes": "Waiting for response. Referred by Olivia.",
+      "id": 2,
+      "createdAt": 1767489409808
+    },
+    {
+      "company": "Northwind Studios",
+      "role": "Gameplay Engineer",
+      "link": "",
+      "date": "2025-01-12",
+      "status": "offer",
+      "location": "Los Angeles, CA",
+      "notes": "Offer in hand. Need to decide by March 1st.",
+      "id": 3,
+      "createdAt": 1767485809808
+    }
+  ],
+  "users": [
+    {
+      "name": "kasim",
+      "location": "germany",
+      "createdAt": 1767494248682,
+      "lastLogin": 1767494304648
+    },
+    {
+      "name": "bob",
+      "location": "usa",
+      "pinHash": "c00c99bd88bf70b63e972d31ac5d6843e1e6108fabcad58bd1aa2f7ed7eb2e0f",
+      "createdAt": 1767567278150,
+      "lastLogin": null,
+      "lastSeen": null
+    },
+    {
+      "name": "san",
+      "location": "germany",
+      "pinHash": "1634c92640e545c8d555212c1db6fe9012ab8f82dd88d7a17705f7bc4a2965da",
+      "createdAt": 1767567852632,
+      "lastLogin": 1767567870262,
+      "lastSeen": 1767568412202,
+      "token": "d584e768e217b8003cddb9540d4f3cd591258e428ff0e0b4",
+      "tokenIssuedAt": 1767567870262
+    }
+  ],
+  "events": [
+    {
+      "type": "login",
+      "owner": "san",
+      "ip": "127.0.0.1",
+      "timestamp": 1767567870262
+    },
+    {
+      "type": "admin_user_create",
+      "owner": "san",
+      "ip": "127.0.0.1",
+      "timestamp": 1767567852632
+    },
+    {
+      "type": "admin_user_create",
+      "owner": "bob",
+      "ip": "127.0.0.1",
+      "timestamp": 1767567278150
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494304648
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494302958
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494301325
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494299719
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494298205
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494264528
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494263242
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494261939
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494260649
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494259337
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494258040
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494256749
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494255446
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494254153
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494252821
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494251535
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494250155
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494248712
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494248686
+    },
+    {
+      "type": "login",
+      "owner": "kasim",
+      "timestamp": 1767494248682
+    }
+  ]
+}
