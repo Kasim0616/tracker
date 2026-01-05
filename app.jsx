@@ -2,6 +2,7 @@ const { useState, useMemo, useCallback, useRef, useEffect } = React;
 const API_BASE = window.BACKEND_URL || "http://127.0.0.1:8000";
 const PROFILE_KEY = "tracker_profile_v1";
 const ADMIN_LOGIN = { name: "trackeradmin", password: "9087700234" };
+const THEME_KEY = "tracker_theme_v1";
 
 const STATUS_CONFIG = [
     { id: "wishlist", label: "Wishlist", blurb: "Roles you're researching or prepping" },
@@ -88,6 +89,10 @@ function App() {
     const [adminForm, setAdminForm] = useState({ name: "", location: "", pin: "" });
     const [portal, setPortal] = useState("user"); // "user" or "admin"
     const formSectionRef = useRef(null);
+    const [theme, setTheme] = useState(() => {
+        if (typeof localStorage === "undefined") return "light";
+        return localStorage.getItem(THEME_KEY) || "light";
+    });
 
     const buildUrl = useCallback(
         (path, options = {}) => {
@@ -101,6 +106,17 @@ function App() {
         },
         [profile?.name]
     );
+
+    useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+        try {
+            localStorage.setItem(THEME_KEY, theme);
+        } catch (err) {
+            console.warn("Could not persist theme", err);
+        }
+    }, [theme]);
+
+    const toggleTheme = () => setTheme((prev) => (prev === "light" ? "dark" : "light"));
 
     const authHeaders = useMemo(() => {
         return profile?.token ? { "X-User-Token": profile.token } : {};
@@ -522,6 +538,8 @@ function App() {
                     }
                 }}
                 onSwitchPortal={() => switchPortal("user")}
+                theme={theme}
+                onToggleTheme={toggleTheme}
             />
         );
     }
@@ -533,32 +551,38 @@ function App() {
                 isSaving={isSaving}
                 errorMessage={authError}
                 onSwitchPortal={() => switchPortal("admin")}
+                theme={theme}
+                onToggleTheme={toggleTheme}
             />
         );
     }
 
     return (
-        <div className="dashboard">
-            <div className="main-layout">
-                <div className="center-column">
+        <>
+            <div className="floating-toggle">
+                <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            </div>
+            <div className="dashboard">
+                <div className="main-layout">
+                    <div className="center-column">
                     <section className="card hero">
                         <div>
-                            <p className="hero__subtitle">Hello {profile.name || "there"}</p>
-                            <h1 className="hero__title">Your job-hunt mission control</h1>
+                            <p className="hero__subtitle">Hello Dear {profile.name || "there"}</p>
+                            <h1 className="hero__title">Start Hunting for Jobs</h1>
                             <p className="hero__subtitle">
                                 Track applications, monitor interviews, and capture insights without the spreadsheet chaos.
                             </p>
                         </div>
                         <div className="hero-actions">
                             <button className="primary-btn" type="button" onClick={scrollToForm}>
-                                + New application
+                                New application 
                             </button>
                         </div>
                     </section>
 
                     <section className="card">
                         <div className="section-heading">
-                            <h2>Pipeline highlights</h2>
+                            <h2>Highlights</h2>
                             <span>{stats.total} tracked roles</span>
                         </div>
                         <StatsRow statusCounts={statusCounts} total={stats.total} />
@@ -585,7 +609,7 @@ function App() {
 
                     <section className="card board-panel">
                         <div className="section-heading">
-                            <h2>Kanban board</h2>
+                            <h2>Dashboard</h2>
                             <span>Drag-free statuses with instant actions</span>
                         </div>
                         {isLoading ? (
@@ -610,24 +634,24 @@ function App() {
                         <form onSubmit={handleFormSubmit}>
                             <div className="form-grid">
                                 <label>
-                                    Company name
+                                Applied company name
                                     <input
                                         className="input-control"
                                         type="text"
                                         name="company"
-                                        placeholder="Acme Robotics"
+                                        placeholder="siemens"
                                         required
                                         value={formData.company}
                                         onChange={handleFormChange}
                                     />
                                 </label>
                                 <label>
-                                    Role / title
+                                    Role 
                                     <input
                                         className="input-control"
                                         type="text"
                                         name="role"
-                                        placeholder="Product Designer II"
+                                        placeholder="Manager"
                                         required
                                         value={formData.role}
                                         onChange={handleFormChange}
@@ -675,7 +699,7 @@ function App() {
                                         className="input-control"
                                         type="text"
                                         name="location"
-                                        placeholder="Remote / NYC / Berlin"
+                                        placeholder="city or country"
                                         value={formData.location}
                                         onChange={handleFormChange}
                                     />
@@ -749,6 +773,7 @@ function App() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 
@@ -768,41 +793,57 @@ function AdminPortal({
     onSaveAdminUser,
     onRemoveAdminUser,
     onClearEvents,
-    onSwitchPortal
+    onSwitchPortal,
+    theme,
+    onToggleTheme
 }) {
     if (!adminAuthenticated) {
         return (
-            <div className="login-screen">
-                <div className="login-grid">
-                    <div className="login-column">
-                        <AdminLoginCard
-                            isAuthenticated={adminAuthenticated}
+            <>
+                <div className="floating-toggle">
+                    <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+                </div>
+                <div className="login-screen">
+                    <div className="login-header">
+                        <div className="brand-mark">
+                            <span className="brand-badge">AT</span>
+                            Application Tracker
+                        </div>
+                        <div className="login-nav">
+                            <button className="pill-tab" type="button" onClick={onSwitchPortal}>
+                                User log in
+                            </button>
+                            <button className="pill-tab is-active" type="button">
+                                Admin log in
+                            </button>
+                        </div>
+                    </div>
+                    <div className="login-grid">
+                        <div className="login-column">
+                            <AdminLoginCard
+                                isAuthenticated={adminAuthenticated}
                             errorMessage={adminAuthError}
                             onLogin={onAdminLogin}
                             onLogout={onAdminLogout}
                             onClearError={onClearAdminAuthError}
                         />
-                        <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
-                            <button className="pill-btn" type="button" onClick={onSwitchPortal}>
-                                User portal
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
-        );
+        </>
+    );
     }
 
     const shellStyle = {
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)",
+        background: "var(--page-bg)",
         padding: "1.5rem",
         boxSizing: "border-box"
     };
     const cardStyle = {
-        background: "#fff",
+        background: "var(--surface-strong)",
         borderRadius: "16px",
-        boxShadow: "0 12px 30px rgba(15, 23, 42, 0.08)",
+        boxShadow: "var(--shadow)",
         padding: "1.25rem"
     };
     const headerStyle = {
@@ -812,8 +853,8 @@ function AdminPortal({
         marginBottom: "1rem"
     };
     const badgeStyle = {
-        background: "#eef2ff",
-        color: "#4338ca",
+        background: "var(--panel)",
+        color: "var(--ink)",
         padding: "0.45rem 0.75rem",
         borderRadius: "999px",
         fontWeight: 600,
@@ -821,19 +862,23 @@ function AdminPortal({
     };
 
     return (
-        <div style={shellStyle}>
-            <div style={headerStyle}>
-                <div>
-                    <h1 style={{ margin: 0, color: "#0f172a" }}>Admin dashboard</h1>
-                    <p style={{ margin: "0.2rem 0", color: "#64748b" }}>Manage members and review activity</p>
-                </div>
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                    <span style={badgeStyle}>Signed in as {ADMIN_LOGIN.name}</span>
-                    <button className="pill-btn" type="button" onClick={onAdminLogout}>
-                        Log out
-                    </button>
-                </div>
+        <>
+            <div className="floating-toggle">
+                <ThemeToggle theme={theme} onToggle={onToggleTheme} />
             </div>
+            <div style={shellStyle}>
+                <div style={headerStyle}>
+                    <div>
+                        <h1 style={{ margin: 0, color: "var(--ink)" }}>Admin dashboard</h1>
+                        <p style={{ margin: "0.2rem 0", color: "var(--muted)" }}>Manage members and review activity</p>
+                    </div>
+                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                        <span style={badgeStyle}>Signed in as {ADMIN_LOGIN.name}</span>
+                        <button className="pill-btn" type="button" onClick={onAdminLogout}>
+                            Log out
+                        </button>
+                    </div>
+                </div>
 
             <div
                 style={{
@@ -845,10 +890,10 @@ function AdminPortal({
             >
                 <div style={cardStyle}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <h2 style={{ margin: 0, color: "#0f172a" }}>Create / update user</h2>
+                        <h2 style={{ margin: 0, color: "var(--ink)" }}>Create / update user</h2>
                     </div>
                     <div style={{ display: "grid", gap: "0.75rem", marginTop: "1rem" }}>
-                        <label style={{ display: "grid", gap: "0.35rem", fontWeight: 600, color: "#0f172a" }}>
+                        <label style={{ display: "grid", gap: "0.35rem", fontWeight: 600, color: "var(--ink)" }}>
                             Full name
                             <input
                                 className="input-control"
@@ -858,7 +903,7 @@ function AdminPortal({
                                 placeholder="Jane Doe"
                             />
                         </label>
-                        <label style={{ display: "grid", gap: "0.35rem", fontWeight: 600, color: "#0f172a" }}>
+                        <label style={{ display: "grid", gap: "0.35rem", fontWeight: 600, color: "var(--ink)" }}>
                             Location (optional)
                             <input
                                 className="input-control"
@@ -868,7 +913,7 @@ function AdminPortal({
                                 placeholder="City, Country"
                             />
                         </label>
-                        <label style={{ display: "grid", gap: "0.35rem", fontWeight: 600, color: "#0f172a" }}>
+                        <label style={{ display: "grid", gap: "0.35rem", fontWeight: 600, color: "var(--ink)" }}>
                             Access code
                             <input
                                 className="input-control"
@@ -893,8 +938,8 @@ function AdminPortal({
 
                 <div style={{ ...cardStyle, minHeight: "320px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <h2 style={{ margin: 0, color: "#0f172a" }}>Users</h2>
-                        <small style={{ color: "#64748b" }}>{adminUsers.length} total</small>
+                        <h2 style={{ margin: 0, color: "var(--ink)" }}>Users</h2>
+                        <small style={{ color: "var(--muted)" }}>{adminUsers.length} total</small>
                     </div>
                     {!adminUsers.length ? (
                         <div className="empty-state" style={{ marginTop: "1rem" }}>
@@ -952,67 +997,65 @@ function AdminPortal({
             </div>
 
             <div style={{ marginTop: "1rem", ...cardStyle }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <h2 style={{ margin: 0, color: "#0f172a" }}>Recent activity</h2>
-                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                        <small style={{ color: "#64748b" }}>{adminEvents.length} events</small>
-                        <button
-                            className="pill-btn"
-                            type="button"
-                            onClick={onClearEvents}
-                            disabled={adminLoading}
+                <div style={{ marginTop: "1rem", ...cardStyle }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h2 style={{ margin: 0, color: "var(--ink)" }}>Recent activity</h2>
+                        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                            <small style={{ color: "var(--muted)" }}>{adminEvents.length} events</small>
+                            <button className="pill-btn" type="button" onClick={onClearEvents} disabled={adminLoading}>
+                                Clear all
+                            </button>
+                        </div>
+                    </div>
+                    {!adminEvents.length ? (
+                        <div className="empty-state" style={{ marginTop: "0.75rem" }}>
+                            No events yet.
+                        </div>
+                    ) : (
+                        <ul
+                            className="admin-list"
+                            style={{
+                                marginTop: "0.75rem",
+                                maxHeight: "680px",
+                                overflowY: "auto",
+                                paddingRight: "0.25rem",
+                                display: "grid",
+                                gap: "0.5rem"
+                            }}
                         >
-                            Clear all
-                        </button>
-                    </div>
-                </div>
-                {!adminEvents.length ? (
-                    <div className="empty-state" style={{ marginTop: "0.75rem" }}>
-                        No events yet.
-                    </div>
-                ) : (
-                    <ul
-                        className="admin-list"
-                        style={{
-                            marginTop: "0.75rem",
-                            maxHeight: "680px",
-                            overflowY: "auto",
-                            paddingRight: "0.25rem",
-                            display: "grid",
-                            gap: "0.5rem"
-                        }}
-                    >
-                        {adminEvents.map((event, idx) => (
-                            <li
-                                key={`${event.timestamp}-${idx}`}
-                                className="admin-row"
-                                style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "1fr auto",
-                                    alignItems: "center",
-                                    padding: "0.65rem 0.85rem",
-                                    borderRadius: "12px",
-                                    background: "#f8fafc",
-                                    border: "1px solid #e2e8f0"
-                                }}
-                            >
-                                <div>
-                                    <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#0f172a" }}>
-                                        {event.type}
+                            {adminEvents.map((event, idx) => (
+                                <li
+                                    key={`${event.timestamp}-${idx}`}
+                                    className="admin-row"
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "1fr auto",
+                                        alignItems: "center",
+                                        padding: "0.65rem 0.85rem",
+                                        borderRadius: "12px",
+                                        background: "var(--panel)",
+                                        border: "1px solid var(--border)"
+                                    }}
+                                >
+                                    <div>
+                                        <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--ink)" }}>
+                                            {event.type}
+                                        </div>
+                                        <small style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                                            {event.owner || "Unknown"}
+                                        </small>
                                     </div>
-                                    <small style={{ color: "#94a3b8", fontSize: "0.85rem" }}>
-                                        {event.owner || "Unknown"}
+                                    <small style={{ color: "var(--muted)", fontSize: "0.85rem", textAlign: "right" }}>
+                                        {formatDateTime(event.timestamp)}
                                     </small>
-                                </div>
-                                <small style={{ color: "#94a3b8", fontSize: "0.85rem", textAlign: "right" }}>
-                                    {formatDateTime(event.timestamp)}
-                                </small>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </div>
-        </div>
+            </div>
+        </>
     );
 }
 
@@ -1205,7 +1248,7 @@ function AdminLoginCard({ isAuthenticated, errorMessage, onLogin, onLogout, onCl
     );
 }
 
-function LoginScreen({ onSubmit, isSaving, errorMessage, onSwitchPortal }) {
+function LoginScreen({ onSubmit, isSaving, errorMessage, onSwitchPortal, theme, onToggleTheme }) {
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
     const [pin, setPin] = useState("");
@@ -1218,15 +1261,29 @@ function LoginScreen({ onSubmit, isSaving, errorMessage, onSwitchPortal }) {
     };
 
     return (
-        <div className="login-screen">
-            <div className="login-grid">
-                <div className="login-column">
-                    <div className="card auth-card">
+        <>
+            <div className="floating-toggle">
+                <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+            </div>
+            <div className="login-screen">
+                <div className="login-header">
+                    <div className="brand-mark">
+                        <span className="brand-badge">AT</span>
+                        Application Tracker
+                    </div>
+                    <div className="login-nav">
+                        <button className="pill-tab is-active" type="button">
+                            User log in
+                        </button>
+                        <button className="pill-tab" type="button" onClick={onSwitchPortal}>
+                            Admin log in
+                        </button>
+                    </div>
+                </div>
+                <div className="login-grid login-single">
+                    <div className="card landing-auth">
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <h1>Member login</h1>
-                            <button className="pill-btn" type="button" onClick={onSwitchPortal}>
-                                Admin portal
-                            </button>
+                            <h1>Log in</h1>
                         </div>
                         <p>Sign in with your name to load your applications.</p>
                         <form onSubmit={handleSubmit} className="auth-form">
@@ -1235,7 +1292,7 @@ function LoginScreen({ onSubmit, isSaving, errorMessage, onSwitchPortal }) {
                                 <input
                                     className="input-control"
                                     type="text"
-                                    placeholder="Jane Doe"
+                                    placeholder="Steve Harrington"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required
@@ -1257,7 +1314,7 @@ function LoginScreen({ onSubmit, isSaving, errorMessage, onSwitchPortal }) {
                                 <input
                                     className="input-control"
                                     type="text"
-                                    placeholder="Remote / City, Country"
+                                    placeholder="City or Country"
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
                                 />
@@ -1270,7 +1327,16 @@ function LoginScreen({ onSubmit, isSaving, errorMessage, onSwitchPortal }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
+    );
+}
+
+function ThemeToggle({ theme, onToggle }) {
+    return (
+        <button className="theme-toggle" type="button" onClick={onToggle}>
+            <span className="theme-toggle__icon">{theme === "light" ? "D" : "L"}</span>
+            <span className="theme-toggle__label">{theme === "light" ? "Dark" : "Light"} mode</span>
+        </button>
     );
 }
 
@@ -1326,7 +1392,7 @@ function TimelineChart({ data }) {
     return (
         <div className="chart">
             <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Applications timeline">
-                <g stroke="#e2e8f0" strokeWidth="1">
+                <g stroke="var(--border)" strokeWidth="1">
                     {[1, 2, 3].map((line) => (
                         <line
                             key={line}
@@ -1518,30 +1584,41 @@ function ProgressDonut({ ratio }) {
 
     return (
         <div className="progress-ring">
-            <svg width={size} height={size}>
+            <svg width={size} height={size} className="progress-ring__svg">
+                <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#7c3aed" />
+                        <stop offset="50%" stopColor="#06b6d4" />
+                        <stop offset="100%" stopColor="#f97316" />
+                    </linearGradient>
+                </defs>
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     fill="transparent"
-                    stroke="#e2e8f0"
+                    stroke="var(--border)"
                     strokeWidth={stroke}
+                    className="progress-ring__track"
                 />
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     fill="transparent"
-                    stroke="#7c3aed"
+                    stroke="url(#progressGradient)"
                     strokeWidth={stroke}
                     strokeDasharray={circumference}
                     strokeDashoffset={offset}
                     strokeLinecap="round"
+                    className="progress-ring__progress"
                 />
             </svg>
             <div className="progress-ring__label">
                 <span>{percent}%</span>
-                <small style={{ display: "block", color: "#94a3b8", fontSize: "0.8rem" }}>Productive</small>
+                <small className="muted" style={{ display: "block", fontSize: "0.8rem" }}>
+                    Productive
+                </small>
             </div>
         </div>
     );
