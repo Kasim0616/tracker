@@ -561,6 +561,11 @@ def run(host: str = "127.0.0.1", port: int = 8000) -> None:
 
 
 if __name__ == "__main__":
-    host = os.environ.get("BACKEND_HOST", "127.0.0.1")
-    port = int(os.environ.get("BACKEND_PORT", "8000"))
+    host = os.environ.get("BACKEND_HOST", "0.0.0.0")
+    # Prefer Render/Heroku PORT, then BACKEND_PORT, then default
+    port_env = os.environ.get("PORT") or os.environ.get("BACKEND_PORT") or "8000"
+    try:
+        port = int(port_env)
+    except ValueError:
+        port = 8000
     run(host, port)
